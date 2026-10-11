@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "northwind-cmdb": {
+      "command": "python",
+      "args": ["-m", "itsm_mcp.servers.domain", "cmdb"],
+      "env": {"MCP_TOKEN": "readonly-token"}
+    },
+    "northwind-ops-gateway": {
+      "command": "python",
+      "args": ["-m", "itsm_mcp.servers.gateway", "--stdio"],
+      "env": {"MCP_TOKEN": "agent-token"}
+    }
+  }
+}
