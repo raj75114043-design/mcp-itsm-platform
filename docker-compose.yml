@@ -1,0 +1,35 @@
+# PostgreSQL + MCP gateway (streamable HTTP) + operations console (+ optional Prometheus)
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment: {POSTGRES_USER: itsm, POSTGRES_PASSWORD: itsm, POSTGRES_DB: itsm}
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: {test: ["CMD-SHELL", "pg_isready -U itsm"], interval: 5s, retries: 10}
+
+  seed:
+    build: .
+    env_file: .env
+    command: ["python", "-m", "itsm_mcp.cli", "seed"]
+    depends_on: {postgres: {condition: service_healthy}}
+    restart: "no"
+
+  gateway:
+    build: .
+    env_file: .env
+    ports: ["8000:8000"]          # MCP endpoint: http://localhost:8000/mcp
+    depends_on: {seed: {condition: service_completed_successfully}}
+
+  console:
+    build: .
+    env_file: .env
+    command: ["streamlit", "run", "streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+    ports: ["8501:8501"]
+    depends_on: {seed: {condition: service_completed_successfully}}
+
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    profiles: ["observability"]
+    volumes: ["./deploy/prometheus.yml:/etc/prometheus/prometheus.yml:ro"]
+    ports: ["9090:9090"]
+
+volumes: {pgdata: {}}

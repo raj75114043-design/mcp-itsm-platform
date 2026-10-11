@@ -1,0 +1,17 @@
+stages: [quality, integration]
+default:
+  image: python:3.11-slim
+  cache: {key: pip, paths: [.cache/pip]}
+  before_script: [pip install -r requirements-dev.txt]
+variables: {PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip", LLM_PROVIDER: none}
+
+quality:
+  stage: quality
+  script: [ruff check ., pytest -q, python -m itsm_mcp.eval.run --gate]
+  artifacts: {paths: [reports/eval.json], expire_in: 30 days}
+
+integration-postgres:
+  stage: integration
+  services: [{name: "postgres:16-alpine", alias: postgres}]
+  variables: {POSTGRES_USER: itsm, POSTGRES_PASSWORD: itsm, POSTGRES_DB: itsm, DATABASE_URL: "postgresql+psycopg://itsm:itsm@postgres:5432/itsm"}
+  script: [python -m itsm_mcp.cli smoke]

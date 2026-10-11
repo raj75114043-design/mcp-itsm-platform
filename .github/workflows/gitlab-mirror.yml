@@ -1,0 +1,17 @@
+name: Mirror to GitLab
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  mirror:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - name: Push to gitlab.com/raj75114043/mcp-itsm-platform
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+        run: |
+          if [ -z "$GITLAB_TOKEN" ]; then echo "GITLAB_TOKEN secret not set; skipping mirror"; exit 0; fi
+          git push --force "https://oauth2:${GITLAB_TOKEN}@gitlab.com/raj75114043/mcp-itsm-platform.git" HEAD:main
