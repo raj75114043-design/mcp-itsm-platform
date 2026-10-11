@@ -1,0 +1,533 @@
+[
+  {
+    "name": "add_work_note",
+    "server": "itsm",
+    "scope": "itsm.write",
+    "risk": "write",
+    "input_schema": {
+      "properties": {
+        "incident_id": {
+          "pattern": "^INC-\\d{5}$",
+          "title": "Incident Id",
+          "type": "string"
+        },
+        "note": {
+          "maxLength": 4000,
+          "minLength": 3,
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "incident_id",
+        "note"
+      ],
+      "title": "WorkNote",
+      "type": "object"
+    }
+  },
+  {
+    "name": "create_incident",
+    "server": "itsm",
+    "scope": "itsm.write",
+    "risk": "write",
+    "input_schema": {
+      "properties": {
+        "title": {
+          "maxLength": 160,
+          "minLength": 5,
+          "title": "Title",
+          "type": "string"
+        },
+        "ci_id": {
+          "description": "Configuration item id, e.g. payments-db",
+          "pattern": "^[a-z0-9-]{3,40}$",
+          "title": "Ci Id",
+          "type": "string"
+        },
+        "priority": {
+          "enum": [
+            "P1",
+            "P2",
+            "P3",
+            "P4"
+          ],
+          "title": "Priority",
+          "type": "string"
+        },
+        "description": {
+          "maxLength": 4000,
+          "minLength": 10,
+          "title": "Description",
+          "type": "string"
+        },
+        "related_change": {
+          "anyOf": [
+            {
+              "pattern": "^CHG-\\d{4}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Related Change"
+        },
+        "idempotency_key": {
+          "anyOf": [
+            {
+              "maxLength": 80,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Repeat calls with the same key return the first result",
+          "title": "Idempotency Key"
+        }
+      },
+      "required": [
+        "title",
+        "ci_id",
+        "priority",
+        "description"
+      ],
+      "title": "CreateIncident",
+      "type": "object"
+    }
+  },
+  {
+    "name": "get_alert",
+    "server": "monitoring",
+    "scope": "monitoring.read",
+    "risk": "read",
+    "input_schema": {
+      "properties": {
+        "alert_id": {
+          "pattern": "^ALR-\\d{3}$",
+          "title": "Alert Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "alert_id"
+      ],
+      "title": "AlertId",
+      "type": "object"
+    }
+  },
+  {
+    "name": "get_article",
+    "server": "knowledge",
+    "scope": "kb.read",
+    "risk": "read",
+    "input_schema": {
+      "properties": {
+        "article_id": {
+          "pattern": "^KB-\\d{4}$",
+          "title": "Article Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "article_id"
+      ],
+      "title": "ArticleId",
+      "type": "object"
+    }
+  },
+  {
+    "name": "get_ci",
+    "server": "cmdb",
+    "scope": "cmdb.read",
+    "risk": "read",
+    "input_schema": {
+      "properties": {
+        "ci_id": {
+          "description": "Configuration item id, e.g. payments-db",
+          "pattern": "^[a-z0-9-]{3,40}$",
+          "title": "Ci Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ci_id"
+      ],
+      "title": "CiId",
+      "type": "object"
+    }
+  },
+  {
+    "name": "get_dependencies",
+    "server": "cmdb",
+    "scope": "cmdb.read",
+    "risk": "read",
+    "input_schema": {
+      "properties": {
+        "ci_id": {
+          "description": "Configuration item id, e.g. payments-db",
+          "pattern": "^[a-z0-9-]{3,40}$",
+          "title": "Ci Id",
+          "type": "string"
+        },
+        "direction": {
+          "default": "downstream",
+          "description": "downstream = what this CI depends on",
+          "enum": [
+            "downstream",
+            "upstream"
+          ],
+          "title": "Direction",
+          "type": "string"
+        },
+        "depth": {
+          "default": 2,
+          "maximum": 3,
+          "minimum": 1,
+          "title": "Depth",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "ci_id"
+      ],
+      "title": "Dependencies",
+      "type": "object"
+    }
+  },
+  {
+    "name": "get_escalation_policy",
+    "server": "oncall",
+    "scope": "oncall.read",
+    "risk": "read",
+    "input_schema": {
+      "properties": {
+        "team": {
+          "maxLength": 60,
+          "minLength": 3,
+          "title": "Team",
+          "type": "string"
+        }
+      },
+      "required": [
+        "team"
+      ],
+      "title": "Team",
+      "type": "object"
+    }
+  },
+  {
+    "name": "get_incident",
+    "server": "itsm",
+    "scope": "itsm.read",
+    "risk": "read",
+    "input_schema": {
+      "properties": {
+        "incident_id": {
+          "pattern": "^INC-\\d{5}$",
+          "title": "Incident Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "incident_id"
+      ],
+      "title": "IncidentId",
+      "type": "object"
+    }
+  },
+  {
+    "name": "impacted_services",
+    "server": "cmdb",
+    "scope": "cmdb.read",
+    "risk": "read",
+    "input_schema": {
+      "properties": {
+        "ci_id": {
+          "description": "Configuration item id, e.g. payments-db",
+          "pattern": "^[a-z0-9-]{3,40}$",
+          "title": "Ci Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ci_id"
+      ],
+      "title": "CiId",
+      "type": "object"
+    }
+  },
+  {
+    "name": "list_active_alerts",
+    "server": "monitoring",
+    "scope": "monitoring.read",
+    "risk": "read",
+    "input_schema": {
+      "properties": {},
+      "title": "NoArgs",
+      "type": "object"
+    }
+  },
+  {
+    "name": "list_changes",
+    "server": "itsm",
+    "scope": "itsm.read",
+    "risk": "read",
+    "input_schema": {
+      "properties": {
+        "ci_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 25,
+          "minItems": 1,
+          "title": "Ci Ids",
+          "type": "array"
+        },
+        "since": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "UTC timestamp, e.g. 2026-10-11T13:00:00Z",
+          "title": "Since"
+        },
+        "until": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "UTC timestamp, e.g. 2026-10-11T13:00:00Z",
+          "title": "Until"
+        }
+      },
+      "required": [
+        "ci_ids",
+        "since",
+        "until"
+      ],
+      "title": "ListChanges",
+      "type": "object"
+    }
+  },
+  {
+    "name": "page_engineer",
+    "server": "oncall",
+    "scope": "oncall.page",
+    "risk": "high",
+    "input_schema": {
+      "properties": {
+        "engineer_id": {
+          "pattern": "^ENG-\\d{3}$",
+          "title": "Engineer Id",
+          "type": "string"
+        },
+        "incident_id": {
+          "anyOf": [
+            {
+              "pattern": "^INC-\\d{5}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Incident Id"
+        },
+        "message": {
+          "maxLength": 500,
+          "minLength": 5,
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "engineer_id",
+        "message"
+      ],
+      "title": "Page",
+      "type": "object"
+    }
+  },
+  {
+    "name": "search_incidents",
+    "server": "itsm",
+    "scope": "itsm.read",
+    "risk": "read",
+    "input_schema": {
+      "properties": {
+        "ci_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z0-9-]{3,40}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Configuration item id, e.g. payments-db",
+          "title": "Ci Id"
+        },
+        "state": {
+          "anyOf": [
+            {
+              "enum": [
+                "open",
+                "new",
+                "in_progress",
+                "resolved"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "State"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Text"
+        },
+        "since": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "UTC timestamp, e.g. 2026-10-11T13:00:00Z",
+          "title": "Since"
+        },
+        "limit": {
+          "default": 10,
+          "maximum": 50,
+          "minimum": 1,
+          "title": "Limit",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "ci_id",
+        "since"
+      ],
+      "title": "SearchIncidents",
+      "type": "object"
+    }
+  },
+  {
+    "name": "search_kb",
+    "server": "knowledge",
+    "scope": "kb.read",
+    "risk": "read",
+    "input_schema": {
+      "properties": {
+        "query": {
+          "maxLength": 300,
+          "minLength": 3,
+          "title": "Query",
+          "type": "string"
+        },
+        "ci_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ci Type"
+        },
+        "service": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Service"
+        },
+        "limit": {
+          "default": 3,
+          "maximum": 10,
+          "minimum": 1,
+          "title": "Limit",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "title": "SearchKB",
+      "type": "object"
+    }
+  },
+  {
+    "name": "who_is_on_call",
+    "server": "oncall",
+    "scope": "oncall.read",
+    "risk": "read",
+    "input_schema": {
+      "properties": {
+        "team": {
+          "maxLength": 60,
+          "minLength": 3,
+          "title": "Team",
+          "type": "string"
+        },
+        "at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "UTC timestamp, e.g. 2026-10-11T13:00:00Z",
+          "title": "At"
+        }
+      },
+      "required": [
+        "team",
+        "at"
+      ],
+      "title": "OnCall",
+      "type": "object"
+    }
+  }
+]
