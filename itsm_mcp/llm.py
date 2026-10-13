@@ -1,7 +1,7 @@
 """LLM provider abstraction with free/open-source defaults and a deterministic fallback.
 
 Providers (all speak the OpenAI-compatible chat API):
-  groq               Free tier hosting open-weight models (Llama 3.x). Set GROQ_API_KEY.
+  groq               Free tier; default model openai/gpt-oss-120b (open-weight). Set GROQ_API_KEY.
   ollama             Local open-source models, e.g. `ollama pull llama3.1:8b`.
   openai_compatible  Any OpenAI-compatible endpoint (vLLM, LM Studio, Together, ...).
   none               No LLM: agents use deterministic planning and templated answers.
