@@ -79,7 +79,7 @@ class OpenAICompatibleClient(LLMClient):
                 if resp.usage:
                     usage.prompt_tokens += resp.usage.prompt_tokens or 0
                     usage.completion_tokens += resp.usage.completion_tokens or 0
-                text = resp.choices[0].message.content or ""
+                text = _normalise(resp.choices[0].message.content or "")
                 usage.events.append({"model": self.model, "ms": round(ms), "ok": True})
                 return _parse_json(text) if json_mode else text.strip()
             except Exception as exc:  # network, rate limit, malformed JSON
@@ -91,6 +91,15 @@ class OpenAICompatibleClient(LLMClient):
                 log.warning("llm_call_failed", extra={"attempt": attempt, "error": str(exc)[:200]})
                 time.sleep(0.5 * (2 ** attempt))
         return None
+
+
+_UNICODE = str.maketrans({"\u2010": "-", "\u2011": "-", "\u2012": "-", "\u2013": "-", "\u2014": "-", "\u2212": "-",
+                          "\u00a0": " ", "\u202f": " ", "\u2009": " ", "\u2018": "'", "\u2019": "'", "\u201c": '"', "\u201d": '"'})
+
+
+def _normalise(text: str) -> str:
+    """Models such as gpt-oss write non-breaking hyphens and spaces; citation IDs and numbers must match the source text."""
+    return text.translate(_UNICODE)
 
 
 def _parse_json(text: str) -> dict | None:
